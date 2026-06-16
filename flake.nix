@@ -11,7 +11,7 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            packages = [ pkgs.hidapi pkgs.pkg-config ];
+            packages = [ pkgs.hidapi pkgs.pkg-config pkgs.quickshell ];
           };
         });
     };
