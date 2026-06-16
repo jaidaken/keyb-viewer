@@ -5,16 +5,15 @@ import Quickshell.Io
 ShellRoot {
     id: root
 
-    readonly property string base: "/home/jaidaken/projects/keyb-viewer/host/overlay"
+    readonly property string home: "/home/jaidaken"
+    readonly property string base: home + "/projects/keyb-viewer/host/overlay"
     readonly property var defaults: ({
             anchor: "bottom-right",
             marginX: 48,
             marginY: 48,
             keySize: 30,
             fontSize: 12,
-            fontFamily: "FiraCode Nerd Font Mono",
-            paletteMode: "dark",
-            palettePath: "/home/jaidaken/.config/noctalia/palettes/greendot.json"
+            fontFamily: "FiraCode Nerd Font Mono"
         })
     readonly property var fallbackColors: ({
             surface: "#111111",
@@ -28,6 +27,10 @@ ShellRoot {
     property var layoutData: ({ layers: [] })
     property var colors: fallbackColors
 
+    // auto-theme: resolved from noctalia's config.toml [theme] section
+    property string paletteMode: "dark"
+    property string activePalettePath: home + "/.config/noctalia/palettes/greendot.json"
+
     function loadCfg(txt) {
         try {
             root.cfg = Object.assign({}, root.defaults, JSON.parse(txt));
@@ -40,7 +43,7 @@ ShellRoot {
     }
     function loadPalette(txt) {
         try {
-            const p = JSON.parse(txt)[root.cfg.paletteMode] || {};
+            const p = JSON.parse(txt)[root.paletteMode] || {};
             root.colors = {
                 surface: p.mSurface || root.fallbackColors.surface,
                 surfaceVariant: p.mSurfaceVariant || root.fallbackColors.surfaceVariant,
@@ -48,6 +51,36 @@ ShellRoot {
                 onSurface: p.mOnSurface || root.fallbackColors.onSurface,
                 outline: p.mOutline || root.fallbackColors.outline
             };
+        } catch (e) {}
+    }
+
+    // parse the [theme] block of noctalia's config.toml without a TOML parser
+    function loadTheme(toml) {
+        try {
+            const start = toml.indexOf("[theme]");
+            if (start < 0)
+                return;
+            let end = toml.length;
+            const re = /\n\[[^\]]+\]/g;
+            re.lastIndex = start + 1;
+            let m;
+            while ((m = re.exec(toml)) !== null) {
+                if (m[0].indexOf("\n[theme.") !== 0) {
+                    end = m.index;
+                    break;
+                }
+            }
+            const block = toml.slice(start, end);
+            const get = k => {
+                const mm = block.match(new RegExp(k + '\\s*=\\s*"([^"]+)"'));
+                return mm ? mm[1] : "";
+            };
+            const source = get("source");
+            root.paletteMode = get("mode") || "dark";
+            if (source === "community")
+                root.activePalettePath = root.home + "/.local/state/noctalia/community-palettes/" + encodeURIComponent(get("community_palette")) + ".json";
+            else
+                root.activePalettePath = root.home + "/.config/noctalia/palettes/" + (get("custom_palette") || "greendot") + ".json";
         } catch (e) {}
     }
 
@@ -66,7 +99,14 @@ ShellRoot {
         onFileChanged: root.loadLayout(text())
     }
     FileView {
-        path: root.cfg.palettePath
+        path: root.home + "/.config/noctalia/config.toml"
+        blockLoading: true
+        watchChanges: true
+        onLoaded: root.loadTheme(text())
+        onFileChanged: root.loadTheme(text())
+    }
+    FileView {
+        path: root.activePalettePath
         blockLoading: true
         watchChanges: true
         onLoaded: root.loadPalette(text())
@@ -96,7 +136,6 @@ ShellRoot {
         property int activeLayer: 0
         readonly property real u: root.cfg.keySize
 
-        // keymap position -> [col, row] for the 42-key Corne (gap between halves)
         readonly property var grid: [
             [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],
             [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],
