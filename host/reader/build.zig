@@ -23,6 +23,17 @@ pub fn build(b: *std.Build) void {
     exe.root_module.linkSystemLibrary("hidapi-hidraw", .{});
     b.installArtifact(exe);
 
+    const parse_exe = b.addExecutable(.{
+        .name = "keymap-parse",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/parse_main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        }),
+    });
+    b.installArtifact(parse_exe);
+
     const run = b.addRunArtifact(exe);
     if (b.args) |args| run.addArgs(args);
     const run_step = b.step("run", "Run the reader");
