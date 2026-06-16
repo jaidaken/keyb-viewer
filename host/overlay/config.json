@@ -1,0 +1,10 @@
+{
+  "anchor": "bottom-right",
+  "marginX": 48,
+  "marginY": 48,
+  "keySize": 30,
+  "fontSize": 12,
+  "fontFamily": "FiraCode Nerd Font Mono",
+  "paletteMode": "dark",
+  "palettePath": "/home/jaidaken/.config/noctalia/palettes/greendot.json"
+}
