@@ -205,11 +205,16 @@ ShellRoot {
                             }
 
                             Text {
-                                anchors.centerIn: parent
+                                anchors.fill: parent
+                                anchors.margins: 2
                                 text: panel.legend(index)
                                 color: panel.pressed[index] ? root.colors.surface : root.colors.onSurface
                                 font.pixelSize: root.cfg.fontSize
                                 font.family: root.cfg.fontFamily
+                                fontSizeMode: Text.HorizontalFit
+                                minimumPixelSize: 7
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
                     }
