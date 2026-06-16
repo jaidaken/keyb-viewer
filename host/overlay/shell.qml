@@ -13,7 +13,8 @@ ShellRoot {
             marginY: 48,
             keySize: 30,
             fontSize: 12,
-            fontFamily: "FiraCode Nerd Font Mono"
+            fontFamily: "FiraCode Nerd Font Mono",
+            opacity: 0.85
         })
     readonly property var fallbackColors: ({
             surface: "#111111",
@@ -160,7 +161,8 @@ ShellRoot {
             implicitWidth: kbd.width + 28
             implicitHeight: header.height + kbd.height + 32
             radius: 14
-            color: Qt.alpha(root.colors.surface, 0.92)
+            opacity: root.cfg.opacity
+            color: root.colors.surface
             border.color: root.colors.outline
             border.width: 1
 
@@ -193,7 +195,7 @@ ShellRoot {
                             width: panel.u - 3
                             height: panel.u - 3
                             radius: 5
-                            color: panel.pressed[index] ? root.colors.primary : Qt.alpha(root.colors.surfaceVariant, 0.9)
+                            color: panel.pressed[index] ? root.colors.primary : root.colors.surfaceVariant
                             border.color: root.colors.outline
                             border.width: 1
                             Behavior on color {

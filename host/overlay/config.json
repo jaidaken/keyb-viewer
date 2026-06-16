@@ -2,7 +2,8 @@
   "anchor": "bottom-right",
   "marginX": 48,
   "marginY": 48,
-  "keySize": 30,
-  "fontSize": 12,
-  "fontFamily": "FiraCode Nerd Font Mono"
+  "keySize": 39,
+  "fontSize": 16,
+  "fontFamily": "FiraCode Nerd Font Mono",
+  "opacity": 0.8
 }
