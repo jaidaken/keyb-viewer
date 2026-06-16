@@ -1,0 +1,8 @@
+config KEYB_VIEWER
+    bool "Enable keyb-viewer Raw HID feed"
+    depends on NICE_OLED_WIDGET_RAW_HID_DRIVER
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    default y if NICE_OLED_WIDGET_RAW_HID_DRIVER && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+    help
+      Emit active-layer and per-key position events to the host overlay over the
+      nice_oled Raw HID endpoint. Central half only.

@@ -1,0 +1,4 @@
+name: keyb-viewer
+build:
+  cmake: .
+  kconfig: Kconfig
