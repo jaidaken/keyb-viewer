@@ -1,0 +1,6 @@
+parse_config:
+  raw_binding_map:
+    "&kp POUND": "£"
+    "&kp LS(SQT)": "@"
+    "&kp LS(N2)": "\""
+    "&kp NUBS": "\\"

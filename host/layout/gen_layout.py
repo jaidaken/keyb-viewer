@@ -8,6 +8,7 @@ position index our raw HID feed reports, so highlighting aligns on any board.
   gen_layout.py <config.keymap> [zmk_keyboard] > layout.json
 """
 import json
+import os
 import subprocess
 import sys
 
@@ -17,8 +18,9 @@ from keymap_drawer.physical_layout import PhysicalLayoutGenerator
 
 
 def parse_legends_and_combos(keymap_path):
+    cfg = os.path.join(os.path.dirname(__file__), "keymap-drawer.yaml")
     out = subprocess.run(
-        ["keymap", "parse", "-z", keymap_path],
+        ["keymap", "-c", cfg, "parse", "-z", keymap_path],
         capture_output=True, text=True, check=True,
     ).stdout
     data = yaml.safe_load(out)
