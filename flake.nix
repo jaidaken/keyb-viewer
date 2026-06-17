@@ -11,7 +11,12 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            packages = [ pkgs.hidapi pkgs.pkg-config pkgs.quickshell ];
+            packages = [
+              pkgs.hidapi
+              pkgs.pkg-config
+              pkgs.quickshell
+              (pkgs.python3.withPackages (ps: with ps; [ keymap-drawer ]))
+            ];
           };
         });
     };

@@ -11,10 +11,11 @@ ShellRoot {
             anchor: "bottom-right",
             marginX: 48,
             marginY: 48,
-            keySize: 30,
-            fontSize: 12,
+            keySize: 39,
+            fontSize: 13,
             fontFamily: "FiraCode Nerd Font Mono",
-            opacity: 0.85
+            opacity: 0.8,
+            showCombos: true
         })
     readonly property var fallbackColors: ({
             surface: "#111111",
@@ -25,10 +26,8 @@ ShellRoot {
         })
 
     property var cfg: defaults
-    property var layoutData: ({ layers: [] })
+    property var layoutData: ({ keys: [], layers: [], combos: [] })
     property var colors: fallbackColors
-
-    // auto-theme: resolved from noctalia's config.toml [theme] section
     property string paletteMode: "dark"
     property string activePalettePath: home + "/.config/noctalia/palettes/greendot.json"
 
@@ -54,8 +53,6 @@ ShellRoot {
             };
         } catch (e) {}
     }
-
-    // parse the [theme] block of noctalia's config.toml without a TOML parser
     function loadTheme(toml) {
         try {
             const start = toml.indexOf("[theme]");
@@ -135,52 +132,92 @@ ShellRoot {
 
         property var pressed: ({})
         property int activeLayer: 0
-        readonly property real u: root.cfg.keySize
 
-        readonly property var grid: [
-            [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],
-            [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],
-            [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2],
-            [3, 3], [4, 3], [5, 3], [7, 3], [8, 3], [9, 3]
-        ]
+        readonly property var lkeys: root.layoutData.keys || []
+        readonly property var combos: root.layoutData.combos || []
+        readonly property real scale: (root.cfg.keySize || 39) / 56
+        readonly property real minX: {
+            var m = 1e9;
+            for (var i = 0; i < lkeys.length; i++) {
+                var v = lkeys[i].x - lkeys[i].w / 2;
+                if (v < m)
+                    m = v;
+            }
+            return lkeys.length ? m : 0;
+        }
+        readonly property real minY: {
+            var m = 1e9;
+            for (var i = 0; i < lkeys.length; i++) {
+                var v = lkeys[i].y - lkeys[i].h / 2;
+                if (v < m)
+                    m = v;
+            }
+            return lkeys.length ? m : 0;
+        }
+        readonly property real boardW: {
+            var m = -1e9;
+            for (var i = 0; i < lkeys.length; i++) {
+                var v = lkeys[i].x + lkeys[i].w / 2;
+                if (v > m)
+                    m = v;
+            }
+            return lkeys.length ? (m - minX) * scale : 0;
+        }
+        readonly property real boardH: {
+            var m = -1e9;
+            for (var i = 0; i < lkeys.length; i++) {
+                var v = lkeys[i].y + lkeys[i].h / 2;
+                if (v > m)
+                    m = v;
+            }
+            return lkeys.length ? (m - minY) * scale : 0;
+        }
 
         function legend(i) {
             const layers = root.layoutData.layers || [];
-            if (panel.activeLayer < layers.length && layers[panel.activeLayer].keys)
-                return layers[panel.activeLayer].keys[i] || "";
+            if (panel.activeLayer < layers.length && layers[panel.activeLayer].keys && layers[panel.activeLayer].keys[i])
+                return layers[panel.activeLayer].keys[i].t || "";
             return "";
         }
-        function layerName() {
+        function baseLabel(pos) {
             const layers = root.layoutData.layers || [];
-            return (panel.activeLayer < layers.length) ? layers[panel.activeLayer].name : ("Layer " + panel.activeLayer);
+            if (layers.length && layers[0].keys && layers[0].keys[pos])
+                return layers[0].keys[pos].t || ("" + pos);
+            return "" + pos;
         }
 
         Rectangle {
             id: card
             anchors.fill: parent
-            implicitWidth: kbd.width + 28
-            implicitHeight: kbd.height + 24
+            implicitWidth: Math.max(panel.boardW, combosCol.implicitWidth) + 28
+            implicitHeight: panel.boardH + (combosCol.visible ? combosCol.implicitHeight + 14 : 0) + 28
             radius: 14
             opacity: root.cfg.opacity
             color: root.colors.surface
             border.color: root.colors.outline
             border.width: 1
 
-            Item {
-                id: kbd
+            Column {
                 anchors.centerIn: parent
-                width: 13 * panel.u
-                height: 4 * panel.u
+                spacing: 12
+
+                Item {
+                    id: kbd
+                    width: panel.boardW
+                    height: panel.boardH
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     Repeater {
-                        model: 42
+                        model: panel.lkeys.length
 
                         delegate: Rectangle {
                             required property int index
-                            x: panel.grid[index][0] * panel.u
-                            y: panel.grid[index][1] * panel.u
-                            width: panel.u - 3
-                            height: panel.u - 3
+                            readonly property var k: panel.lkeys[index]
+                            x: (k.x - k.w / 2 - panel.minX) * panel.scale
+                            y: (k.y - k.h / 2 - panel.minY) * panel.scale
+                            width: k.w * panel.scale
+                            height: k.h * panel.scale
+                            rotation: k.r
                             radius: 5
                             color: panel.pressed[index] ? root.colors.primary : root.colors.surfaceVariant
                             border.color: root.colors.outline
@@ -194,13 +231,33 @@ ShellRoot {
                                 font.pixelSize: root.cfg.fontSize
                                 font.family: root.cfg.fontFamily
                                 fontSizeMode: Text.HorizontalFit
-                                minimumPixelSize: 7
+                                minimumPixelSize: 6
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }
                     }
                 }
+
+                Column {
+                    id: combosCol
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 3
+                    visible: root.cfg.showCombos && panel.combos.length > 0
+
+                    Repeater {
+                        model: panel.combos
+
+                        delegate: Text {
+                            required property var modelData
+                            text: modelData.positions.map(p => panel.baseLabel(p)).join(" + ") + "  →  " + modelData.output
+                            color: root.colors.onSurface
+                            font.pixelSize: root.cfg.fontSize - 2
+                            font.family: root.cfg.fontFamily
+                        }
+                    }
+                }
+            }
         }
 
         Process {
