@@ -129,6 +129,7 @@ ShellRoot {
         implicitWidth: card.implicitWidth
         implicitHeight: card.implicitHeight
         color: "transparent"
+        mask: Region {}
 
         property var pressed: ({})
         property int activeLayer: 0
