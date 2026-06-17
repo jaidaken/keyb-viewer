@@ -185,11 +185,6 @@ ShellRoot {
                             color: panel.pressed[index] ? root.colors.primary : root.colors.surfaceVariant
                             border.color: root.colors.outline
                             border.width: 1
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 60
-                                }
-                            }
 
                             Text {
                                 anchors.fill: parent
