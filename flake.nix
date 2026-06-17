@@ -15,6 +15,9 @@
               pkgs.hidapi
               pkgs.pkg-config
               pkgs.quickshell
+              pkgs.cargo
+              pkgs.rustc
+              pkgs.udev
               (pkgs.python3.withPackages (ps: with ps; [ keymap-drawer ]))
             ];
           };

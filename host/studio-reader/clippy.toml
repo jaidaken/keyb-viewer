@@ -1,0 +1,8 @@
+disallowed-methods = [
+  { path = "std::option::Option::unwrap", reason = "use .expect(\"reason\") or proper handling" },
+  { path = "std::result::Result::unwrap", reason = "use .expect or ? operator" },
+  { path = "std::fs::write", reason = "non-atomic; use temp+rename pattern (rule R7)" },
+]
+
+cognitive-complexity-threshold = 25
+type-complexity-threshold = 250
