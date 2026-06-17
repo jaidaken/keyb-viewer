@@ -41,7 +41,7 @@ SHORT = {
     "LCTRL": "Ctrl", "RCTRL": "Ctrl", "LSHIFT": "Shft", "RSHIFT": "Shft", "LEFT SHIFT": "Shft",
     "LEFT ALT": "Alt", "RIGHT ALT": "Alt", "LALT": "Alt", "RALT": "Alt",
     "LCMD": "Cmd", "LGUI": "Cmd", "RGUI": "Cmd",
-    "&caps": "Caps", "&caps_word": "CapsWd",
+    "&caps": "Caps", "&caps_word": "CapsWd", "&studio_unlock": "Unlock",
 }
 
 
