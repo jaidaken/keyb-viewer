@@ -159,31 +159,18 @@ ShellRoot {
             id: card
             anchors.fill: parent
             implicitWidth: kbd.width + 28
-            implicitHeight: header.height + kbd.height + 32
+            implicitHeight: kbd.height + 24
             radius: 14
             opacity: root.cfg.opacity
             color: root.colors.surface
             border.color: root.colors.outline
             border.width: 1
 
-            Column {
+            Item {
+                id: kbd
                 anchors.centerIn: parent
-                spacing: 8
-
-                Text {
-                    id: header
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: panel.layerName()
-                    color: root.colors.primary
-                    font.pixelSize: root.cfg.fontSize + 5
-                    font.bold: true
-                    font.family: root.cfg.fontFamily
-                }
-
-                Item {
-                    id: kbd
-                    width: 13 * panel.u
-                    height: 4 * panel.u
+                width: 13 * panel.u
+                height: 4 * panel.u
 
                     Repeater {
                         model: 42
@@ -219,7 +206,6 @@ ShellRoot {
                         }
                     }
                 }
-            }
         }
 
         Process {
